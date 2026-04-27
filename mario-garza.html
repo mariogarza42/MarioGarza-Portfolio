@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mario Garza</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════
+   ROOT / RESET
+══════════════════════════════════════ */
+:root {
+  --blue-bg:   #c5ddf4;
+  --blue-mid:  #a8c8e8;
+  --grid:      rgba(255,255,255,0.72);
+  --cell:      120px;
+  --red:       #e8401c;
+  --ink:       #1a1a1a;
+  --blue-text: #2563b8;
+  --blue-dark: #1a4a8a;
+  --white:     #ffffff;
+  --pill-bg:   #ffffff;
+  --font:      'Nunito', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--blue-bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+  font-family: var(--font);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════
+   TOP NAV BAR — full-width strip
+══════════════════════════════════════ */
+.topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 12px;
+  height: 48px;
+  border-bottom: 2px solid var(--red);
+}
+
+.topnav a {
+  font-family: var(--font);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+}
+.topnav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.topnav a.active { background: var(--red); color: #fff; }
+
+/* ══════════════════════════════════════
+   PANEL BASE
+══════════════════════════════════════ */
+.panel {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px 60px;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════
+   FLOATING PILL LABELS  (word cloud)
+══════════════════════════════════════ */
+.pill-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Each pill is absolutely placed */
+.fp {
+  position: absolute;
+  background: var(--pill-bg);
+  border-radius: 999px;
+  padding: 0.45em 1.1em;
+  font-family: var(--font);
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  pointer-events: none;
+  user-select: none;
+  /* gentle float animation */
+  animation: floatPill 6s ease-in-out infinite;
+}
+
+/* staggered delays so they move independently */
+.fp:nth-child(1)  { animation-delay: 0s;    font-size: 1.4rem; }
+.fp:nth-child(2)  { animation-delay: -1s;   font-size: 1rem; }
+.fp:nth-child(3)  { animation-delay: -2s;   font-size: 1.6rem; }
+.fp:nth-child(4)  { animation-delay: -3s;   font-size: 0.85rem; }
+.fp:nth-child(5)  { animation-delay: -0.5s; font-size: 1.2rem; }
+.fp:nth-child(6)  { animation-delay: -1.8s; font-size: 0.9rem; }
+.fp:nth-child(7)  { animation-delay: -2.5s; font-size: 1.5rem; }
+.fp:nth-child(8)  { animation-delay: -0.8s; font-size: 1rem; }
+.fp:nth-child(9)  { animation-delay: -3.5s; font-size: 0.85rem; }
+.fp:nth-child(10) { animation-delay: -1.3s; font-size: 1.3rem; }
+.fp:nth-child(11) { animation-delay: -2.2s; font-size: 0.9rem; }
+.fp:nth-child(12) { animation-delay: -4s;   font-size: 1.1rem; }
+.fp:nth-child(13) { animation-delay: -0.3s; font-size: 0.8rem; }
+.fp:nth-child(14) { animation-delay: -1.6s; font-size: 1.4rem; }
+
+/* red accent pills */
+.fp.red { background: var(--red); color: #fff; }
+
+@keyframes floatPill {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ══════════════════════════════════════
+   BIG BACKGROUND WORDS (non-hero panels)
+══════════════════════════════════════ */
+.bg-words { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+.bw {
+  position: absolute;
+  font-family: var(--font);
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  color: var(--ink);
+  opacity: 0.85;
+}
+.bw.on-red { background: var(--red); color: var(--ink); padding: 0.1em 0.25em; }
+
+/* ══════════════════════════════════════
+   SCROLL HINT
+══════════════════════════════════════ */
+.scroll-hint {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.35);
+  z-index: 10;
+}
+
+/* ══════════════════════════════════════
+   §1 HERO — Dictionary card + pills
+══════════════════════════════════════ */
+.dict-card {
+  background: var(--white);
+  padding: 2.4rem 2.8rem;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 6px 40px rgba(0,0,0,0.13);
+  border-radius: 4px;
+}
+
+.dict-word {
+  font-family: var(--font);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.dict-phonetic {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #666;
+  margin-bottom: 0.05rem;
+}
+
+.dict-pos {
+  font-size: 0.82rem;
+  font-weight: 400;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.7rem;
+}
+
+.dict-rule { height: 1px; background: #ddd; margin-bottom: 1rem; }
+
+.dict-body {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.72;
+  margin-bottom: 0.7rem;
+}
+.dict-body em { font-style: italic; font-weight: 700; }
+
+.dict-see {
+  font-size: 0.82rem;
+  color: #555;
+  font-style: italic;
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+.dict-variation {
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.dict-cta {
+  margin-top: 1.6rem;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btn-dark {
+  font-family: var(--font);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  transition: all 0.18s;
+  display: inline-block;
+  background: var(--ink);
+  color: #fff;
+}
+.btn-dark:hover { background: var(--red); }
+
+.btn-outline {
+  font-family: var(--font);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  display: inline-block;
+  transition: all 0.18s;
+}
+.btn-outline:hover { background: var(--ink); color: #fff; }
+
+/* ══════════════════════════════════════
+   §2 INTRO — Memo card
+══════════════════════════════════════ */
+.memo-card {
+  background: var(--white);
+  border-radius: 14px;
+  max-width: 580px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 6px 40px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+.memo-bar {
+  background: #f0f0f0;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot.r { background: #ff5f57; }
+.dot.y { background: #ffbd2e; }
+.dot.g { background: #28c840; }
+.memo-bar .idx {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-left: auto;
+}
+
+.memo-body { padding: 2rem 2.2rem 2.2rem; }
+
+.memo-meta {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 1.4rem;
+  line-height: 2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.memo-meta b { color: var(--ink); }
+
+.memo-big {
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 1.2rem;
+}
+
+.memo-small {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #888;
+  line-height: 1.8;
+}
+
+.memo-sign {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-top: 1.3rem;
+  line-height: 2;
+}
+
+/* ══════════════════════════════════════
+   SECTION TITLE CHIP
+══════════════════════════════════════ */
+.s-chip {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: var(--ink);
+  border-radius: 999px;
+  padding: 6px 20px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+.s-chip em { color: var(--red); font-style: normal; margin-left: 0.4em; }
+
+/* ══════════════════════════════════════
+   §3 VALUE CARDS
+══════════════════════════════════════ */
+.cards-row {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1000px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.v-card {
+  background: var(--white);
+  padding: 2rem 1.8rem;
+  flex: 1;
+  min-width: 240px;
+  max-width: 300px;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+  border-radius: 6px;
+}
+
+.v-tag {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--red);
+  color: #fff;
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.v-card h3 {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.9rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.v-card ul { list-style: none; }
+.v-card ul li {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #444;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #eee;
+  line-height: 1.5;
+  display: flex;
+  gap: 0.4rem;
+}
+.v-card ul li::before { content: '→'; color: var(--red); flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   §4 EXPERIENCE TABLE
+══════════════════════════════════════ */
+.table-card {
+  background: var(--white);
+  position: relative;
+  z-index: 10;
+  max-width: 820px;
+  width: 100%;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.table-head-bar {
+  background: var(--ink);
+  padding: 1rem 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-head-bar span {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.table-head-bar .tag {
+  background: var(--red);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+}
+
+.exp-tbl { width: 100%; border-collapse: collapse; }
+.exp-tbl thead tr { background: #f7f7f7; border-bottom: 2px solid var(--ink); }
+.exp-tbl thead td {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #999;
+  padding: 0.7rem 1.1rem;
+}
+.exp-tbl tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
+.exp-tbl tbody tr:hover { background: #f5f9ff; }
+.exp-tbl td { padding: 0.9rem 1.1rem; vertical-align: top; }
+.exp-tbl td.t-date { font-size: 0.6rem; font-weight: 600; color: #999; white-space: nowrap; width: 120px; }
+.exp-tbl td.t-org { font-size: 0.82rem; font-weight: 900; color: var(--ink); width: 180px; }
+.exp-tbl td.t-role { font-size: 0.72rem; font-weight: 400; color: #555; font-style: italic; }
+.exp-tbl td.t-result { font-size: 0.65rem; font-weight: 800; color: var(--red); text-align: right; white-space: nowrap; }
+
+/* ══════════════════════════════════════
+   §5 STRENGTHS — dark panel
+══════════════════════════════════════ */
+.panel.dark {
+  background-color: var(--ink);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+}
+.panel.dark .s-chip { background: var(--red); }
+.panel.dark .scroll-hint { color: rgba(255,255,255,0.3); }
+
+.str-wrap {
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.str-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.str-c {
+  padding: 2.2rem 1.8rem;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.str-c:last-child { border-right: none; }
+
+.str-c .num {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.9rem;
+  display: block;
+}
+.str-c h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+.str-c p {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.8;
+}
+
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.stat-c {
+  padding: 1.8rem 1.4rem;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.stat-c:last-child { border-right: none; }
+.stat-n {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.03em;
+}
+.stat-n sup { font-size: 1rem; color: var(--red); }
+.stat-l {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+/* ══════════════════════════════════════
+   §6 GOALS
+══════════════════════════════════════ */
+.goals-row {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.g-card {
+  background: var(--white);
+  padding: 2rem 1.8rem;
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+  border-radius: 6px;
+}
+
+.g-tag {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--red);
+  color: #fff;
+  display: inline-block;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.g-card h3 {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+.g-card p {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #555;
+  line-height: 1.8;
+}
+
+/* ══════════════════════════════════════
+   §7 AWARDS MOSAIC
+══════════════════════════════════════ */
+.aw-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  max-width: 900px;
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.7);
+  gap: 1px;
+  background: rgba(255,255,255,0.7);
+  position: relative;
+  z-index: 10;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.aw-tile {
+  background: var(--white);
+  padding: 1.3rem 1.1rem;
+  transition: background 0.15s;
+}
+.aw-tile:hover { background: #eef5ff; }
+
+.aw-tile.feat {
+  grid-column: span 2;
+  background: var(--ink);
+}
+.aw-tile.feat:hover { background: #2a2a2a; }
+
+.aw-tile .yr {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.aw-tile p {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #444;
+  line-height: 1.6;
+}
+.aw-tile.feat p { color: rgba(255,255,255,0.75); font-size: 0.75rem; font-weight: 600; }
+.aw-tile.feat .yr { color: #e06040; }
+
+/* ══════════════════════════════════════
+   §8 ACTIVITIES
+══════════════════════════════════════ */
+.act-card {
+  background: var(--white);
+  position: relative;
+  z-index: 10;
+  max-width: 780px;
+  width: 100%;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.act-bar {
+  background: var(--ink);
+  padding: 0.9rem 1.5rem;
+}
+.act-bar span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.act-list { list-style: none; }
+.act-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  transition: background 0.15s;
+}
+.act-item:hover { background: #f5f9ff; }
+.act-item:last-child { border-bottom: none; }
+
+.act-org { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
+.act-role { font-size: 0.65rem; font-weight: 400; color: #888; margin-top: 0.15rem; }
+.act-date { font-size: 0.6rem; font-weight: 800; color: var(--red); text-align: right; white-space: nowrap; letter-spacing: 0.04em; }
+
+/* ══════════════════════════════════════
+   §9 CONTACT / CTA
+══════════════════════════════════════ */
+.cta-card {
+  background: var(--white);
+  position: relative;
+  z-index: 10;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cta-top {
+  background: var(--red);
+  padding: 2.5rem 2.5rem 1.8rem;
+}
+.cta-top h2 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.02em;
+}
+.cta-top p {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: rgba(0,0,0,0.6);
+  line-height: 1.75;
+}
+
+.cta-rows { padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+.c-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  border: 1.5px solid #eee;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.c-row:hover { border-color: var(--red); background: #fff5f3; }
+.c-row .lbl { font-size: 0.52rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #bbb; margin-bottom: 0.15rem; }
+.c-row .val { font-size: 0.78rem; font-weight: 800; color: var(--ink); }
+.c-row .arr { font-size: 1rem; color: var(--red); font-weight: 900; }
+
+/* ══════════════════════════════════════
+   PANEL LABEL (top-left corner tag)
+══════════════════════════════════════ */
+.plabel {
+  position: absolute;
+  top: 58px;
+  left: 28px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.28);
+  z-index: 5;
+}
+.panel.dark .plabel { color: rgba(255,255,255,0.2); }
+
+/* ══════════════════════════════════════
+   REVEAL ANIMATION
+══════════════════════════════════════ */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.65s, transform 0.65s; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 760px) {
+  :root { --cell: 80px; }
+  .topnav { gap: 2px; padding: 0 6px; }
+  .topnav a { font-size: 0.52rem; padding: 5px 8px; }
+  .panel { padding: 70px 16px 50px; }
+  .fp { display: none; }
+  .str-grid { grid-template-columns: 1fr; }
+  .stat-strip { grid-template-columns: repeat(2,1fr); }
+  .aw-grid { grid-template-columns: repeat(2,1fr); }
+  .aw-tile.feat { grid-column: span 2; }
+  .act-item { grid-template-columns: 1fr; }
+  .act-date { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════
+  TOP NAV — full section names
+════════════════════════════ -->
+<nav class="topnav" id="topnav">
+  <a href="#hero"        class="active">Mario Garza</a>
+  <a href="#intro">Brand Statement</a>
+  <a href="#value">Value Proposition</a>
+  <a href="#experience">Experience</a>
+  <a href="#strengths">Character Profile</a>
+  <a href="#goals">Goals</a>
+  <a href="#awards">Awards</a>
+  <a href="#activities">Activities</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<div class="scroll-hint">scroll down</div>
+
+<!-- ═══════════════════════════════════════════
+  §1  HERO — floating word pills + dictionary card
+════════════════════════════════════════════ -->
+<section class="panel" id="hero">
+  <div class="plabel">mario garza · personal brand</div>
+
+  <!-- floating pill word cloud BEHIND the card -->
+  <div class="pill-field">
+    <!-- positions tuned to surround the center card -->
+    <div class="fp" style="top:12%; left:5%;">Initiative</div>
+    <div class="fp red" style="top:18%; right:8%;">Scholar</div>
+    <div class="fp" style="top:32%; left:2%;">Bilingual</div>
+    <div class="fp" style="top:8%; right:22%;">Strategic</div>
+    <div class="fp red" style="top:55%; left:4%;">Leader</div>
+    <div class="fp" style="top:70%; left:8%;">Dedicated</div>
+    <div class="fp" style="top:42%; right:4%;">Hard-Working</div>
+    <div class="fp red" style="top:62%; right:6%;">High-Achieving</div>
+    <div class="fp" style="bottom:18%; left:14%;">Collaborative</div>
+    <div class="fp" style="bottom:10%; right:16%;">Kind</div>
+    <div class="fp red" style="top:25%; left:18%;">Driven</div>
+    <div class="fp" style="bottom:25%; right:12%;">Professional</div>
+    <div class="fp" style="top:78%; right:22%;">Resilient</div>
+    <div class="fp red" style="bottom:14%; left:32%;">Marketing &amp; Sales</div>
+  </div>
+
+  <!-- white dictionary card -->
+  <div class="dict-card reveal">
+    <div class="dict-word">Mario Garza</div>
+    <div class="dict-phonetic">[mɑːr-ee-oh gɑːr-zah]</div>
+    <div class="dict-pos">noun</div>
+    <div class="dict-rule"></div>
+    <div class="dict-body">
+      A <em>driven, curious, and resilient</em> student at the University of Houston's C.T. Bauer College of Business studying <em>Marketing, Sales, and Supply Chain Management.</em>
+    </div>
+    <div class="dict-see">
+      See also: <em>Initiative, Scholar, Leader, Hard-Working, Strategic, High-Achieving, Bilingual, Dedicated, Collaborative, Kind</em>
+    </div>
+    <div class="dict-variation">
+      Variation: Houston, Texas<br>
+      "The most prepared entry-level hire in the room."
+    </div>
+    <div class="dict-cta">
+      <a href="mailto:mcgarza8@cougarnet.uh.edu" class="btn-dark">Email Me ↗</a>
+      <a href="https://linkedin.com/in/mariogarza25" target="_blank" class="btn-outline">LinkedIn</a>
+      <a href="#intro" class="btn-outline">Scroll Down ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §2  BRAND STATEMENT — memo card
+════════════════════════════════════════════ -->
+<section class="panel" id="intro">
+  <div class="plabel">index</div>
+  <div class="s-chip">Brand Statement <em>§ 02</em></div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:6%;left:-2%;font-size:clamp(2rem,6vw,5.5rem);">BAUER</div>
+    <div class="bw" style="bottom:8%;right:-2%;font-size:clamp(1.8rem,5vw,5rem);opacity:0.5;">HOUSTON</div>
+  </div>
+
+  <div class="memo-card reveal">
+    <div class="memo-bar">
+      <div class="dot r"></div>
+      <div class="dot y"></div>
+      <div class="dot g"></div>
+      <span class="idx">INDEX</span>
+    </div>
+    <div class="memo-body">
+      <div class="memo-meta">
+        <b>FROM:</b> Mario Garza &nbsp;·&nbsp; mcgarza8@cougarnet.uh.edu<br>
+        <b>SUBJECT:</b> Introduction &amp; Brand Statement
+      </div>
+      <div class="memo-big">
+        Dear recruiter, I am a first-generation bilingual student
+        who has spent 3+ years learning business by doing it —
+        not just studying it. I closed deals, founded clubs,
+        led organizations, and earned scholarships while
+        maintaining a 3.61 GPA. I am ready to bring that
+        same energy to your team.
+      </div>
+      <div class="memo-small">
+        Target: Companies seeking high-achieving, bilingual, performance-driven talent<br>
+        in sales, marketing, or business development roles in Houston and beyond.<br>
+        All results are real. Any resemblance to an ideal hire is intentional.
+      </div>
+      <div class="memo-sign">
+        BEST,<br>MARIO GARZA
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §3  VALUE PROPOSITION
+════════════════════════════════════════════ -->
+<section class="panel" id="value" style="flex-direction:column; gap:2rem; padding-top:130px;">
+  <div class="plabel">value proposition</div>
+  <div class="s-chip">Value Proposition <em>§ 03</em></div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:5%;left:-2%;font-size:clamp(2rem,5vw,4.5rem);">EXPERIENCE</div>
+    <div class="bw" style="bottom:6%;right:-2%;font-size:clamp(1.8rem,4vw,4rem);opacity:0.5;">SKILLS</div>
+  </div>
+
+  <div class="cards-row reveal">
+    <div class="v-card">
+      <div class="v-tag">Experience</div>
+      <h3>3+ Years.<br>4 Domains.</h3>
+      <ul>
+        <li>$2,800 revenue — 100% over quota (PES)</li>
+        <li>Hosted Houston's largest nonprofit golf tournament</li>
+        <li>50+ accounts managed simultaneously</li>
+        <li>+15% student recruitment growth at TRiO</li>
+        <li>$20K raised as a HS entrepreneur</li>
+        <li>$25K SGA student fund managed</li>
+      </ul>
+    </div>
+    <div class="v-card">
+      <div class="v-tag">Skills</div>
+      <h3>Tools That<br>Ship Results.</h3>
+      <ul>
+        <li>Salesforce · 2nd in PES Report Contest</li>
+        <li>Bloomberg CRM — donor outreach</li>
+        <li>Adobe Photoshop &amp; Canva</li>
+        <li>Microsoft Excel — financial modeling</li>
+        <li>Python programming</li>
+        <li>SPIN Selling methodology</li>
+        <li>Fluent English &amp; Spanish</li>
+      </ul>
+    </div>
+    <div class="v-card">
+      <div class="v-tag">Education</div>
+      <h3>Built for<br>Business.</h3>
+      <ul>
+        <li>BBA Marketing &amp; Supply Chain · UH Bauer '27</li>
+        <li>Certificate in Professional Sales · Stagner '26</li>
+        <li>A.A. Business · COM Cum Laude 2025 · 3.61 GPA</li>
+        <li>Dean's List 2023–2025 · Phi Theta Kappa</li>
+        <li>2025 All-Texas Academic Team · Bronze Scholar</li>
+        <li>Phillips 66 Case Competition — 2nd Place</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §4  EXPERIENCE
+════════════════════════════════════════════ -->
+<section class="panel" id="experience" style="flex-direction:column; gap:2rem; padding-top:130px;">
+  <div class="plabel">record of performance</div>
+  <div class="s-chip">Work Experience <em>§ 04</em></div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:6%;right:-2%;font-size:clamp(1.8rem,5vw,4.5rem);">RESULTS</div>
+  </div>
+
+  <div class="table-card reveal">
+    <div class="table-head-bar">
+      <span>Work Experience</span>
+      <span class="tag">Record of Performance</span>
+    </div>
+    <table class="exp-tbl">
+      <thead>
+        <tr>
+          <td>Period</td><td>Organization</td><td>Role</td><td style="text-align:right">Key Result</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="t-date">Jan–Dec 2026</td>
+          <td class="t-org">Stagner PES</td>
+          <td class="t-role">Sales Student Professional</td>
+          <td class="t-result">200%+ Quota · President's Club</td>
+        </tr>
+        <tr>
+          <td class="t-date">Jul–Nov 2025</td>
+          <td class="t-org">Higher Up Texas</td>
+          <td class="t-role">Marketing Intern</td>
+          <td class="t-result">Strategic Planning Committee</td>
+        </tr>
+        <tr>
+          <td class="t-date">Oct 2023–Jul 2025</td>
+          <td class="t-org">TRiO Upward Bound</td>
+          <td class="t-role">Marketing Intern &amp; Tutor</td>
+          <td class="t-result">+15% Student Recruitment</td>
+        </tr>
+        <tr>
+          <td class="t-date">Jul–Oct 2023</td>
+          <td class="t-org">Steam Kaffe</td>
+          <td class="t-role">Barista Team Lead</td>
+          <td class="t-result">Supervised &amp; Trained Team</td>
+        </tr>
+        <tr>
+          <td class="t-date">Aug 2021–May 2023</td>
+          <td class="t-org">Yuhm Brownies</td>
+          <td class="t-role">Founder &amp; Baker</td>
+          <td class="t-result">$20K Revenue · Self-Started</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §5  CHARACTER PROFILE — dark panel
+════════════════════════════════════════════ -->
+<section class="panel dark" id="strengths" style="flex-direction:column; gap:2rem; padding-top:130px;">
+  <div class="plabel">core traits</div>
+  <div class="s-chip" style="background:var(--red);">Character Profile <em style="color:#fff;opacity:0.7;">§ 05</em></div>
+
+  <div class="str-wrap reveal">
+    <div class="str-grid">
+      <div class="str-c">
+        <span class="num">Trait 01 / 03</span>
+        <h3>Curious</h3>
+        <p>SPIN Selling runs on great questions. So does great leadership. Mario's academic research — from psychology to philosophy — reflects a genuine drive to understand people, systems, and the "why."</p>
+      </div>
+      <div class="str-c">
+        <span class="num">Trait 02 / 03</span>
+        <h3>Driven</h3>
+        <p>100% quota exceeded. $20K raised as a teenager. Clubs founded. Boards joined. Mario sets targets and closes them — whether it's a sales quota, a GPA, or a scholarship deadline.</p>
+      </div>
+      <div class="str-c">
+        <span class="num">Trait 03 / 03</span>
+        <h3>Resilient</h3>
+        <p>First-generation student who transferred, rebuilt, and accelerated. Graduated Cum Laude, joined 10+ organizations, earned 15+ awards, and volunteered 300+ hours. Setbacks are data, not conclusions.</p>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="stat-c">
+        <div class="stat-n">$20<sup>K</sup></div>
+        <div class="stat-l">Revenue in HS</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-n">100<sup>%</sup></div>
+        <div class="stat-l">Quota Exceeded</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-n">300<sup>+</sup></div>
+        <div class="stat-l">Volunteer Hours</div>
+      </div>
+      <div class="stat-c">
+        <div class="stat-n">15<sup>+</sup></div>
+        <div class="stat-l">Awards &amp; Scholarships</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §6  GOALS
+════════════════════════════════════════════ -->
+<section class="panel" id="goals" style="flex-direction:column; gap:2rem; padding-top:130px;">
+  <div class="plabel">strategic objectives</div>
+  <div class="s-chip">Goals <em>§ 06</em></div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:5%;left:-2%;font-size:clamp(1.8rem,4vw,3.5rem);">GOALS</div>
+    <div class="bw" style="bottom:6%;right:-2%;font-size:clamp(1.5rem,3.5vw,3rem);opacity:0.5;">2025–27</div>
+  </div>
+
+  <div class="goals-row reveal">
+    <div class="g-card">
+      <div class="g-tag">Primary</div>
+      <h3>Corporate Employment</h3>
+      <p>A performance-driven role in sales, marketing, or business development at a company that rewards initiative and invests in developing bilingual young talent into future leaders.</p>
+    </div>
+    <div class="g-card">
+      <div class="g-tag">Secondary</div>
+      <h3>Conference Access</h3>
+      <p>Building on 20+ conferences attended — from Business Today International to Fortune 500 events — to keep growing a national professional network and represent Houston's emerging talent.</p>
+    </div>
+    <div class="g-card">
+      <div class="g-tag">Academic</div>
+      <h3>Scholarships &amp; Partnerships</h3>
+      <p>Continuing to earn merit-based scholarships and partnerships from HACU, Coca-Cola, Kia, and MGM that support first-generation students pursuing business excellence.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §7  AWARDS
+════════════════════════════════════════════ -->
+<section class="panel" id="awards" style="flex-direction:column; gap:2rem; padding-top:130px;">
+  <div class="plabel">honors &amp; recognition</div>
+  <div class="s-chip">Honors &amp; Awards <em>§ 07</em></div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:5%;right:-2%;font-size:clamp(1.5rem,4vw,3.5rem);">HONORS</div>
+  </div>
+
+  <div class="aw-grid reveal">
+    <div class="aw-tile feat">
+      <span class="yr">2026 · President's Club — Stagner PES</span>
+      <p>Awarded for hitting over 200% of the PES Open Golf Tournament quota — the highest performer recognition in the program.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2025 · Phillips 66 Case Competition</span>
+      <p>2nd Place out of 20 teams — global case on tariff shock at UH Bauer.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2025 · Cum Laude &amp; Dean's List</span>
+      <p>3.61 GPA, Cum Laude from COM. Dean's List 2023–2025.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2025 · All-Texas Academic Team</span>
+      <p>Phi Theta Kappa nominee statewide. Coca-Cola Bronze Scholar.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2026 · HACU &amp; Kia Scholarship</span>
+      <p>Accelerate the Good — for high-achieving first-gen undergrads in business.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2024 · HACU Scholarships</span>
+      <p>Coca-Cola First Gen + MGM Resorts International Scholarship.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2025 · TJC SGA Student of the Year</span>
+      <p>Region V 1st Place + State 3rd Place.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2025 · Rotaract Club of the Year</span>
+      <p>President &amp; Founder · $10K+ raised · hurricane relief led.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2026 · Ted Bauer Above &amp; Beyond</span>
+      <p>1 of 10 scholars for holistic leadership in project settings.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2025 · Drum Major Award</span>
+      <p>300+ volunteer hours, community impact, role model at COM.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2023 · DECA Honors</span>
+      <p>Emerging Leader Award + Whataburger Scholarship as DECA Founder.</p>
+    </div>
+    <div class="aw-tile">
+      <span class="yr">2023 · IME Becas — Mexican Consulate</span>
+      <p>Scholarship for students of Hispanic origin pursuing education.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §8  ACTIVITIES
+════════════════════════════════════════════ -->
+<section class="panel" id="activities" style="flex-direction:column; gap:2rem; padding-top:130px;">
+  <div class="plabel">leadership &amp; organizations</div>
+  <div class="s-chip">Leadership &amp; Activities <em>§ 08</em></div>
+
+  <div class="act-card reveal">
+    <div class="act-bar"><span>Leadership &amp; Activities</span></div>
+    <ul class="act-list">
+      <li class="act-item">
+        <div>
+          <div class="act-org">Management Leadership for Tomorrow (MLT)</div>
+          <div class="act-role">Corporate Management CP Fellow · 18-month selective program</div>
+        </div>
+        <div class="act-date">Jan 2026–Present</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">Hispanic Business Network of Galveston County</div>
+          <div class="act-role">Communications Chair &amp; Secretary · Board of Directors</div>
+        </div>
+        <div class="act-date">Jul 2024–Present</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">HACU — Hispanic Association of Colleges &amp; Universities</div>
+          <div class="act-role">Student Ambassador · 1 of 50 nationwide (HNIPC) · Emerging Leaders Summit</div>
+        </div>
+        <div class="act-date">Nov 2024–Present</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">UH Undergraduate Energy Club</div>
+          <div class="act-role">Chief Marketing Officer · Day-to-day marketing &amp; communications</div>
+        </div>
+        <div class="act-date">Aug 2025–Present</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">UH American Marketing Association</div>
+          <div class="act-role">Member · 1 of 20 selected for AMA International Collegiate Conference 2026</div>
+        </div>
+        <div class="act-date">Aug 2025–Present</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">Rotaract Club of College of the Mainland</div>
+          <div class="act-role">President &amp; Founder · Club of the Year · $10K+ raised</div>
+        </div>
+        <div class="act-date">Jul 2024–May 2025</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">Student Government Association — COM</div>
+          <div class="act-role">President &amp; Treasurer · Managed $25K student fund · Voted in by student body</div>
+        </div>
+        <div class="act-date">Aug 2023–May 2025</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">Ion Houston (Rice University)</div>
+          <div class="act-role">Student Ambassador · Social media campaign reaching 27,000+ impressions</div>
+        </div>
+        <div class="act-date">Jul 2024–May 2025</div>
+      </li>
+      <li class="act-item">
+        <div>
+          <div class="act-org">Dickinson High School DECA</div>
+          <div class="act-role">Captain &amp; Founder · Led team to State Competition across multiple categories</div>
+        </div>
+        <div class="act-date">Aug 2021–May 2023</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §9  CONTACT
+════════════════════════════════════════════ -->
+<section class="panel" id="contact">
+  <div class="plabel">contact</div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:10%;left:-2%;font-size:clamp(2rem,6vw,5rem);">CONNECT</div>
+    <div class="bw" style="bottom:10%;right:-2%;font-size:clamp(1.5rem,4vw,4rem);opacity:0.5;">HIRE ME</div>
+  </div>
+
+  <div class="cta-card reveal">
+    <div class="cta-top">
+      <h2>Let's build something together.</h2>
+      <p>Whether you're a recruiter, a company, or a professional who sees the potential — Mario responds within 24 hours. Reach out and let's start a conversation.</p>
+    </div>
+    <div class="cta-rows">
+      <a href="mailto:mcgarza8@cougarnet.uh.edu" class="c-row">
+        <div><div class="lbl">Email</div><div class="val">mcgarza8@cougarnet.uh.edu</div></div>
+        <div class="arr">↗</div>
+      </a>
+      <a href="https://linkedin.com/in/mariogarza25" target="_blank" class="c-row">
+        <div><div class="lbl">LinkedIn</div><div class="val">linkedin.com/in/mariogarza25</div></div>
+        <div class="arr">↗</div>
+      </a>
+      <a href="tel:8324363813" class="c-row">
+        <div><div class="lbl">Phone</div><div class="val">(832) 436–3813</div></div>
+        <div class="arr">↗</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll reveal
+  const obs = new IntersectionObserver(
+    es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } }),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.topnav a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) cur = s.id; });
+    links.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + cur) a.classList.add('active');
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
