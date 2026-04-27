@@ -773,85 +773,316 @@ body {
 }
 
 /* ══════════════════════════════════════
-   CAROUSEL
+   COVERFLOW CAROUSEL
 ══════════════════════════════════════ */
 .carousel-wrap {
   position: relative;
   z-index: 10;
+  width: 100%;
+  max-width: 900px;
   display: flex;
-  justify-content: center;
-  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
 }
 
-.carousel-card {
-  max-width: 400px;
+/* the stage clips side overflow but keeps prev/next visible */
+.cf-stage {
   width: 100%;
-}
-
-.carousel-viewport {
   overflow: hidden;
-  width: 100%;
+  padding: 20px 0 30px;
+  position: relative;
 }
 
-.carousel-track {
+.cf-track {
   display: flex;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 520px;
 }
 
-.carousel-slide {
-  flex: 0 0 100%;
+/* each card is absolutely placed and transformed by JS */
+.cf-slide {
+  position: absolute;
+  width: 260px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1),
+              opacity  0.45s ease,
+              box-shadow 0.45s ease;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+
+/* photo area */
+.cf-slide .cf-img {
   width: 100%;
+  aspect-ratio: 3/4;
+  background: #dce8f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
 }
 
-/* arrow controls row */
-.carousel-controls {
+.cf-slide .cf-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* label overlaid on the photo */
+.cf-slide .cf-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.4rem 1.2rem 1rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
+}
+.cf-slide .cf-overlay .cf-num {
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+.cf-slide .cf-overlay .cf-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* caption strip below photo */
+.cf-slide .cf-caption {
+  padding: 0.85rem 1.1rem 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+.cf-slide .cf-caption .cf-cap-label {
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+.cf-slide .cf-caption p {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #444;
+  line-height: 1.55;
+}
+
+/* placeholder icon when no photo */
+.cf-ph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+.cf-ph svg { width: 40px; height: 40px; opacity: 0.25; }
+.cf-ph span {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8aaac4;
+}
+
+/* arrow buttons — circular ghost on the sides */
+.cf-arrows {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.9rem 1.2rem;
-  border-top: 1px solid #f0f0f0;
-  gap: 0.5rem;
+  width: 100%;
+  padding: 0 8px;
 }
 
-.carr-btn {
-  background: var(--ink);
+.cf-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
   border: none;
-  border-radius: 999px;
-  width: 36px;
-  height: 36px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.14);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
   flex-shrink: 0;
-  transition: background 0.18s, transform 0.15s;
 }
-.carr-btn:hover { background: var(--red); transform: scale(1.08); }
-.carr-btn svg { width: 16px; height: 16px; stroke: #fff; }
+.cf-arrow:hover {
+  background: var(--red);
+  transform: scale(1.1);
+  box-shadow: 0 4px 20px rgba(232,64,28,0.3);
+}
+.cf-arrow:hover svg { stroke: #fff; }
+.cf-arrow svg { width: 18px; height: 18px; stroke: var(--ink); transition: stroke 0.18s; }
 
-/* dot indicators */
-.carr-dots {
+/* dot strip */
+.cf-dots {
   display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
   justify-content: center;
   flex: 1;
 }
-
-.carr-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ddd;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+.cf-dot {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.15);
   border: none;
   padding: 0;
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: width 0.3s, background 0.3s;
+  width: 6px;
 }
-.carr-dot.active { background: var(--red); transform: scale(1.3); }
-.carr-dot:hover { background: #aaa; }
+.cf-dot.active {
+  width: 22px;
+  background: var(--red);
+}
+.cf-dot:hover { background: rgba(0,0,0,0.35); }
+
+/* ══════════════════════════════════════
+   REVIEWS — notification popups
+══════════════════════════════════════ */
+.reviews-section {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 130px 40px 80px;
+  overflow: hidden;
+}
+
+.reviews-title-wrap {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.reviews-title-wrap h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.reviews-title-wrap h2 em { font-style: italic; color: var(--red); }
+
+.reviews-title-wrap p {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #666;
+  margin-top: 0.6rem;
+}
+
+/* notification cards field */
+.notif-field {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  min-height: 520px;
+  z-index: 10;
+}
+
+/* each notification card */
+.notif {
+  position: absolute;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  width: 280px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  animation: floatNotif 7s ease-in-out infinite;
+}
+
+/* icon badge */
+.notif-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--blue-bg);
+}
+
+.notif-body { flex: 1; min-width: 0; }
+
+.notif-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.2rem;
+}
+
+.notif-name {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-time {
+  font-size: 0.55rem;
+  font-weight: 400;
+  color: #aaa;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.notif-role {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--red);
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.02em;
+}
+
+.notif-text {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #444;
+  line-height: 1.55;
+}
+
+/* staggered float animations */
+@keyframes floatNotif {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+.notif:nth-child(1) { animation-delay: 0s;    animation-duration: 6.5s; }
+.notif:nth-child(2) { animation-delay: -1.2s; animation-duration: 7.2s; }
+.notif:nth-child(3) { animation-delay: -2.5s; animation-duration: 6.8s; }
+.notif:nth-child(4) { animation-delay: -0.8s; animation-duration: 7.5s; }
+.notif:nth-child(5) { animation-delay: -3.1s; animation-duration: 6.2s; }
+.notif:nth-child(6) { animation-delay: -1.8s; animation-duration: 7.8s; }
 
 /* ══════════════════════════════════════
    §6 GOALS
@@ -1103,6 +1334,7 @@ body {
   <a href="#goals">Goals</a>
   <a href="#awards">Awards</a>
   <a href="#activities">Activities</a>
+  <a href="#reviews">Reviews</a>
   <a href="#contact">Contact</a>
 </nav>
 
@@ -1202,9 +1434,9 @@ body {
 </section>
 
 <!-- ═══════════════════════════════════════════
-  §3  PHOTO GALLERY CAROUSEL
+  §3  PHOTO GALLERY — COVERFLOW CAROUSEL
 ════════════════════════════════════════════ -->
-<section class="panel" id="photos" style="flex-direction:column; gap:2rem; padding-top:130px;">
+<section class="panel" id="photos" style="flex-direction:column; gap:0; padding-top:130px; padding-bottom:60px;">
   <div class="plabel">photo gallery</div>
   <div class="s-chip">Gallery <em>§ 03</em></div>
 
@@ -1213,256 +1445,29 @@ body {
     <div class="bw" style="bottom:6%;right:-2%;font-size:clamp(1.5rem,4vw,4rem);opacity:0.5;">GARZA</div>
   </div>
 
-  <!-- carousel wrapper -->
   <div class="carousel-wrap reveal">
-
-    <!-- the memo card shell -->
-    <div class="photo-memo carousel-card">
-      <div class="pm-bar">
-        <div class="dot r"></div>
-        <div class="dot y"></div>
-        <div class="dot g"></div>
-        <span class="pm-idx" id="carousel-counter">1 / 15</span>
+    <!-- stage: clips overflow, shows prev/next peeking -->
+    <div class="cf-stage">
+      <div class="cf-track" id="cf-track">
+        <!-- slides injected by JS below -->
       </div>
+    </div>
 
-      <!-- slides -->
-      <div class="carousel-viewport">
-        <div class="carousel-track" id="carousel-track">
-
-          <!-- SLIDE 1 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <!-- Replace ph div with: <img src="photo1.jpg" alt="Mario Garza"> -->
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 01</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Mario Garza · UH Bauer '27</span>
-              <p>Sales Student Professional · Marketing &amp; Supply Chain · Houston, TX</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 2 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 02</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Leadership · SGA President</span>
-              <p>Managed $25K student fund · Voted in by the student body at COM</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 3 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 03</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Sales · Stagner PES Program</span>
-              <p>Closed $2,800 in revenue · Exceeded quota 100% · President's Club</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 4 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 04</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Rotaract Club · Founder &amp; President</span>
-              <p>Club of the Year · Led 40+ volunteers · $10K+ raised for community</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 5 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 05</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">HACU · Student Ambassador</span>
-              <p>1 of 50 selected nationwide · HNIPC Career Readiness Cohort</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 6 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 06</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Phillips 66 Case Competition</span>
-              <p>2nd Place out of 20 teams · UH Bauer Global Case Competition 2025</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 7 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 07</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Ion Houston · Rice University</span>
-              <p>Student Ambassador · Social media campaign reaching 27,000+ impressions</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 8 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 08</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">DECA · Captain &amp; Founder</span>
-              <p>Dickinson High School DECA · Led team to State Competition</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 9 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 09</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Hispanic Business Network</span>
-              <p>Communications Chair · Consulted 40+ Latino business owners in Galveston County</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 10 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 10</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">MLT · Corporate Management Fellow</span>
-              <p>Selective 18-month program · Fortune 500 conferences with Google &amp; Adobe</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 11 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 11</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">AMA · International Conference</span>
-              <p>1 of 20 UH students selected to compete at AMA International Collegiate Conference 2026</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 12 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 12</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Yuhm Brownies · Founder</span>
-              <p>Raised $20K in high school · Sales, logistics, and financial planning</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 13 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 13</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Volunteer · Community Service</span>
-              <p>300+ hours · Hurricane relief · Trash clean-up · STEM outreach with IDEA Lab Kids</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 14 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 14</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Phi Theta Kappa · Honor Society</span>
-              <p>2025 All-Texas Academic Team · Bronze Scholar on Coca-Cola's Academic Team</p>
-            </div>
-          </div>
-
-          <!-- SLIDE 15 -->
-          <div class="carousel-slide">
-            <div class="pm-img">
-              <div class="ph">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                <span>Photo 15</span>
-              </div>
-            </div>
-            <div class="pm-caption">
-              <span class="cap-label">Conferences · Nationwide</span>
-              <p>Business Today · LeaderShape · Whirlpool BUILD · 20+ conferences attended</p>
-            </div>
-          </div>
-
-        </div><!-- /carousel-track -->
-      </div><!-- /carousel-viewport -->
-
-      <!-- arrow controls -->
-      <div class="carousel-controls">
-        <button class="carr-btn" id="carr-prev" aria-label="Previous photo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </button>
-
-        <!-- dot indicators -->
-        <div class="carr-dots" id="carr-dots"></div>
-
-        <button class="carr-btn" id="carr-next" aria-label="Next photo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-      </div>
-
-    </div><!-- /photo-memo carousel-card -->
-  </div><!-- /carousel-wrap -->
+    <!-- bottom row: arrow · dots · arrow -->
+    <div class="cf-arrows">
+      <button class="cf-arrow" id="cf-prev" aria-label="Previous">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="cf-dots" id="cf-dots"></div>
+      <button class="cf-arrow" id="cf-next" aria-label="Next">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
 </section>
 
 <!-- ═══════════════════════════════════════════
@@ -1803,7 +1808,107 @@ body {
 </section>
 
 <!-- ═══════════════════════════════════════════
-  §9  CONTACT
+  §10  REVIEWS — floating notification cards
+════════════════════════════════════════════ -->
+<section class="reviews-section" id="reviews">
+  <div class="plabel">what people say</div>
+  <div class="s-chip" style="position:relative;top:0;left:0;transform:none;margin-bottom:2rem;">Reviews <em>§ 10</em></div>
+
+  <div class="bg-words">
+    <div class="bw on-red" style="top:5%;right:-2%;font-size:clamp(1.5rem,4vw,3.5rem);">REVIEWS</div>
+  </div>
+
+  <div class="reviews-title-wrap reveal">
+    <h2>What people<br>say about <em>Mario.</em></h2>
+    <p>Recommendations from colleagues, mentors, and supervisors.</p>
+  </div>
+
+  <!-- 6 floating notification cards -->
+  <div class="notif-field reveal">
+
+    <!-- NOTIF 1 — top left -->
+    <div class="notif" style="top:0; left:0;">
+      <div class="notif-icon">🏆</div>
+      <div class="notif-body">
+        <div class="notif-header">
+          <span class="notif-name">Add Name Here</span>
+          <span class="notif-time">now</span>
+        </div>
+        <div class="notif-role">Title · Organization</div>
+        <div class="notif-text">"Add your recommendation text here. This is where a colleague, mentor, or supervisor can speak to Mario's strengths and impact."</div>
+      </div>
+    </div>
+
+    <!-- NOTIF 2 — top right -->
+    <div class="notif" style="top:0; right:0;">
+      <div class="notif-icon">🎯</div>
+      <div class="notif-body">
+        <div class="notif-header">
+          <span class="notif-name">Add Name Here</span>
+          <span class="notif-time">1m ago</span>
+        </div>
+        <div class="notif-role">Title · Organization</div>
+        <div class="notif-text">"Add your recommendation text here. This is where a colleague, mentor, or supervisor can speak to Mario's strengths and impact."</div>
+      </div>
+    </div>
+
+    <!-- NOTIF 3 — middle left -->
+    <div class="notif" style="top:50%; left:0; transform:translateY(-50%);">
+      <div class="notif-icon">⭐</div>
+      <div class="notif-body">
+        <div class="notif-header">
+          <span class="notif-name">Add Name Here</span>
+          <span class="notif-time">3m ago</span>
+        </div>
+        <div class="notif-role">Title · Organization</div>
+        <div class="notif-text">"Add your recommendation text here. This is where a colleague, mentor, or supervisor can speak to Mario's strengths and impact."</div>
+      </div>
+    </div>
+
+    <!-- NOTIF 4 — middle right -->
+    <div class="notif" style="top:50%; right:0; transform:translateY(-50%);">
+      <div class="notif-icon">💼</div>
+      <div class="notif-body">
+        <div class="notif-header">
+          <span class="notif-name">Add Name Here</span>
+          <span class="notif-time">5m ago</span>
+        </div>
+        <div class="notif-role">Title · Organization</div>
+        <div class="notif-text">"Add your recommendation text here. This is where a colleague, mentor, or supervisor can speak to Mario's strengths and impact."</div>
+      </div>
+    </div>
+
+    <!-- NOTIF 5 — bottom left -->
+    <div class="notif" style="bottom:0; left:0;">
+      <div class="notif-icon">🌟</div>
+      <div class="notif-body">
+        <div class="notif-header">
+          <span class="notif-name">Add Name Here</span>
+          <span class="notif-time">8m ago</span>
+        </div>
+        <div class="notif-role">Title · Organization</div>
+        <div class="notif-text">"Add your recommendation text here. This is where a colleague, mentor, or supervisor can speak to Mario's strengths and impact."</div>
+      </div>
+    </div>
+
+    <!-- NOTIF 6 — bottom right -->
+    <div class="notif" style="bottom:0; right:0;">
+      <div class="notif-icon">🚀</div>
+      <div class="notif-body">
+        <div class="notif-header">
+          <span class="notif-name">Add Name Here</span>
+          <span class="notif-time">12m ago</span>
+        </div>
+        <div class="notif-role">Title · Organization</div>
+        <div class="notif-text">"Add your recommendation text here. This is where a colleague, mentor, or supervisor can speak to Mario's strengths and impact."</div>
+      </div>
+    </div>
+
+  </div><!-- /notif-field -->
+</section>
+
+<!-- ═══════════════════════════════════════════
+  §11  CONTACT
 ════════════════════════════════════════════ -->
 <section class="panel" id="contact">
   <div class="plabel">contact</div>
@@ -1836,14 +1941,14 @@ body {
 </section>
 
 <script>
-  // Scroll reveal
+  // ── Scroll reveal ──────────────────────────
   const obs = new IntersectionObserver(
     es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } }),
     { threshold: 0.08 }
   );
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-  // Active nav highlight on scroll
+  // ── Active nav highlight ────────────────────
   const sections = document.querySelectorAll('section[id]');
   const links = document.querySelectorAll('.topnav a');
   window.addEventListener('scroll', () => {
@@ -1854,44 +1959,125 @@ body {
       if (a.getAttribute('href') === '#' + cur) a.classList.add('active');
     });
   }, { passive: true });
-</script>
-<script>
-  // ── Carousel ──────────────────────────────
-  const track    = document.getElementById('carousel-track');
-  const counter  = document.getElementById('carousel-counter');
-  const dotsWrap = document.getElementById('carr-dots');
-  const TOTAL    = 15;
-  let current    = 0;
+
+  // ── Coverflow Carousel ──────────────────────
+  const SLIDES = [
+    { num:'01', title:'Mario Garza',      label:'UH Bauer \'27',          caption:'Sales Student Professional · Marketing & Supply Chain · Houston, TX' },
+    { num:'02', title:'SGA President',    label:'Leadership',              caption:'Managed $25K student fund · Voted in by the student body at COM' },
+    { num:'03', title:'Stagner PES',      label:'Sales',                   caption:'Closed $2,800 in revenue · Exceeded quota 100% · President\'s Club' },
+    { num:'04', title:'Rotaract Founder', label:'Community',               caption:'Club of the Year · Led 40+ volunteers · $10K+ raised for community' },
+    { num:'05', title:'HACU Ambassador',  label:'National Program',        caption:'1 of 50 selected nationwide · HNIPC Career Readiness Cohort' },
+    { num:'06', title:'Phillips 66 Case', label:'Competition',             caption:'2nd Place out of 20 teams · UH Bauer Global Case Competition 2025' },
+    { num:'07', title:'Ion Houston',      label:'Rice University',         caption:'Student Ambassador · Social media campaign reaching 27,000+ impressions' },
+    { num:'08', title:'DECA Founder',     label:'Dickinson HS',            caption:'Captain & Founder · Led team to State Competition' },
+    { num:'09', title:'HBN Galveston',    label:'Communications Chair',    caption:'Consulted 40+ Latino business owners in Galveston County' },
+    { num:'10', title:'MLT Fellow',       label:'Corporate Program',       caption:'Selective 18-month program · Fortune 500 conferences with Google & Adobe' },
+    { num:'11', title:'AMA Conference',   label:'International',           caption:'1 of 20 UH students selected for AMA Collegiate Conference 2026' },
+    { num:'12', title:'Yuhm Brownies',    label:'Founder',                 caption:'Raised $20K in high school · Sales, logistics, and financial planning' },
+    { num:'13', title:'Volunteer Work',   label:'Community Service',       caption:'300+ hours · Hurricane relief · Trash clean-up · STEM outreach' },
+    { num:'14', title:'Phi Theta Kappa',  label:'Honor Society',           caption:'2025 All-Texas Academic Team · Coca-Cola Bronze Scholar' },
+    { num:'15', title:'Conferences',      label:'Nationwide',              caption:'Business Today · LeaderShape · Whirlpool BUILD · 20+ attended' },
+  ];
+
+  const TOTAL  = SLIDES.length;
+  let current  = 0;
+
+  const track  = document.getElementById('cf-track');
+  const dotsEl = document.getElementById('cf-dots');
+
+  // build slides
+  SLIDES.forEach((s, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'cf-slide';
+    slide.innerHTML = `
+      <div class="cf-img">
+        <div class="cf-ph">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8aaac4" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <span>Photo ${s.num}</span>
+        </div>
+        <div class="cf-overlay">
+          <span class="cf-num">Photo ${s.num} / ${TOTAL}</span>
+          <div class="cf-title">${s.title}</div>
+        </div>
+      </div>
+      <div class="cf-caption">
+        <span class="cf-cap-label">${s.label}</span>
+        <p>${s.caption}</p>
+      </div>`;
+    slide.addEventListener('click', () => goTo(i));
+    track.appendChild(slide);
+  });
 
   // build dots
-  for (let i = 0; i < TOTAL; i++) {
+  SLIDES.forEach((_, i) => {
     const d = document.createElement('button');
-    d.className = 'carr-dot' + (i === 0 ? ' active' : '');
-    d.setAttribute('aria-label', `Go to photo ${i + 1}`);
+    d.className = 'cf-dot' + (i === 0 ? ' active' : '');
     d.addEventListener('click', () => goTo(i));
-    dotsWrap.appendChild(d);
-  }
+    dotsEl.appendChild(d);
+  });
 
   function goTo(idx) {
-    // wrap around
     current = ((idx % TOTAL) + TOTAL) % TOTAL;
-    track.style.transform = `translateX(-${current * 100}%)`;
-    counter.textContent = `${current + 1} / ${TOTAL}`;
-    // update dots
-    dotsWrap.querySelectorAll('.carr-dot').forEach((d, i) => {
+    render();
+  }
+
+  function render() {
+    const slides = track.querySelectorAll('.cf-slide');
+    const stageW = track.parentElement.offsetWidth;
+    const cardW  = Math.min(260, stageW * 0.52);
+    const gap    = cardW * 0.65;
+
+    slides.forEach((slide, i) => {
+      let d = i - current;
+      if (d >  TOTAL / 2) d -= TOTAL;
+      if (d < -TOTAL / 2) d += TOTAL;
+
+      const absD      = Math.abs(d);
+      const isActive  = d === 0;
+      const isAdjacent = absD === 1;
+      const visible   = absD <= 1;
+
+      const tx      = d * gap;
+      const scale   = isActive ? 1 : 0.78;
+      const opacity = isActive ? 1 : isAdjacent ? 0.6 : 0;
+      const zIndex  = isActive ? 10 : isAdjacent ? 5 : 0;
+      const blur    = isActive ? 0 : 1.5;
+
+      slide.style.cssText = `
+        transform: translateX(${tx}px) scale(${scale});
+        opacity: ${opacity};
+        z-index: ${zIndex};
+        pointer-events: ${visible ? 'auto' : 'none'};
+        filter: blur(${blur}px);
+        width: ${cardW}px;
+      `;
+    });
+
+    dotsEl.querySelectorAll('.cf-dot').forEach((d, i) => {
       d.classList.toggle('active', i === current);
     });
   }
 
-  document.getElementById('carr-prev').addEventListener('click', () => goTo(current - 1));
-  document.getElementById('carr-next').addEventListener('click', () => goTo(current + 1));
+  document.getElementById('cf-prev').addEventListener('click', () => goTo(current - 1));
+  document.getElementById('cf-next').addEventListener('click', () => goTo(current + 1));
 
-  // keyboard support when gallery is in view
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft')  goTo(current - 1);
     if (e.key === 'ArrowRight') goTo(current + 1);
   });
-</script>
 
+  let touchX = 0;
+  track.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) goTo(dx < 0 ? current + 1 : current - 1);
+  });
+
+  window.addEventListener('resize', render, { passive: true });
+  render();
+</script>
 </body>
 </html>
